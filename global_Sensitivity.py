@@ -11,9 +11,6 @@ import SALib
 from SALib.sample import saltelli
 from SALib.sample import latin
 from SALib.analyze import sobol
-from scipy.stats import sem, t
-from scipy import mean
-
 
 # butyrate dose in the intestine
 bI1 = 0.18  # with antibiotic -0.11, -0.093, -0.13
@@ -59,7 +56,7 @@ def f(variable):
     return (first, second, third)
 
 
-solution = fsolve(f, (0.1, 0.1, 0.1))
+solution = np.array(fsolve(f, (0.1, 0.1, 0.1)))
 
 
 # solution = least_squares(f, (0.1, 0.1, 0.1), bounds = ((0, 0, 0), (1, 1, 1)))
@@ -74,7 +71,7 @@ def f(variable):
     return (first, second, third)
 
 
-solution1 = fsolve(f, (0.1, 0.1, 0.1))
+solution1 = np.array(fsolve(f, (0.1, 0.1, 0.1)))
 
 
 # print(solution1)
@@ -88,7 +85,7 @@ def f(variable):
     return (first, second)
 
 
-solution2 = fsolve(f, (0.1, 0.1))
+solution2 = np.array(fsolve(f, (0.1, 0.1)))
 
 
 # Updating butyrate dose
@@ -98,7 +95,7 @@ def f(variable):
     return (first)
 
 
-solution3 = fsolve(f, (0.1))
+solution3 = np.array(fsolve(f, (0.1)))
 
 # evaluated parameters
 gamma = solution[2]  # activity
@@ -205,36 +202,23 @@ def diff(x,T, without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3):
 
 store = []
 N = 28        # Total number of days
-#x = (x0,x1,x2,x3,x4,x5)
 x = (x0,x1,x2,x3,x4,x5,x6,x7,x8)
 
 
 T = np.arange(0.0, N, 0.1)
 result = np.array(odeint(diff, x, T, args= (without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3)))
 
-#result = odeint(diff, x, T, args= (without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3))[len(x) - 1]
-#result1 = odeint(diff, x, T, args= (without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3))
-
-#result1 = np.array(odeint(diff, x, T, args= (without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3)))
-
-#print(result)
-#result1 = np.array(result1)
-#print(result1[-1,:])
-
-
-#print(result[:])
-#print(len(T))
 
 # defining problem
 problem = {
   'num_vars': 8, #a's, b's and initial condition
   'names': ['b-','b+','γ','FB1', 'AB12', 'AB23', 'δTR12', 'δTR23'],
-  'bounds':  np.column_stack((np.array([without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3])*0.1,np.array([without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3])*1.9))
+  'bounds':  np.column_stack((np.array([without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3])*1,np.array([without_but1, with_but1,gamma,Fb,Ab,Ab1,Gamma2,Gamma3])*1.1))
 }
-
+# 0.1 and 1.9
 # Generate samples
 vals = saltelli.sample(problem, 500)
-#vals = latin.sample(problem, 2000)
+
 
 
 Y = np.zeros([len(vals),9])
@@ -242,99 +226,11 @@ Y = np.zeros([len(vals),9])
 for i in range(len(vals)):
   Y[i][:] = odeint(diff,x,T,args=(vals[i][0],vals[i][1],vals[i][2],vals[i][3],vals[i][4],vals[i][5],vals[i][6],vals[i][7]))[len(T)-1]
 
-print(Y[:,8])
-
-
-'''
-#Y = np.zeros([len(vals),len(T),x])
-Y = []
-list = []
-Y1 = np.zeros([len(vals),9])
-
-for i in range(len(vals)):
-  Y = np.array(odeint(diff,x,T,args=(vals[i][0],vals[i][1],vals[i][2],vals[i][3],vals[i][4],vals[i][5],vals[i][6],vals[i][7])))
-  list.append(Y)
-  Y1[i][:] = odeint(diff, x, T, args=(vals[i][0], vals[i][1], vals[i][2], vals[i][3], vals[i][4], vals[i][5], vals[i][6], vals[i][7]))[len(T) - 1]
-
-list = np.array(list)
-
-#print(list[:,-1,8])
-#print(Y1[:,8])
-
-'''
-
-'''
-confidence = 0.95
-data = Y1[:,8]
-
-#data = Y1[:,8]/(Y1[:,8] + Y1[:,5])
-
-n = len(data)
-m = mean(data)
-std_err = sem(data)
-h = std_err * t.ppf((1 + confidence) / 2, n - 1)
-
-print(m)
-
-low = m - h
-print(low)
-
-high = m + h
-print(high)
-'''
-
-'''
-meanValue = []
-upperValue = []
-lowerValue = []
-for i in range(len(T)):
-    confidence = 0.95
-    data = list[:,i,8]/(list[:,i,8] + list[:,i,5])
-
-    n = len(data)
-    m = mean(data)
-    std_err = sem(data)
-    h = std_err * t.ppf((1 + confidence) / 2, n - 1)
-
-    meanValue.append(m)
-
-    low = m - h
-    lowerValue.append(low)
-
-    high = m + h
-    upperValue.append(high)
-
-meanValue = np.array(meanValue)
-upperValue = np.array(upperValue)
-lowerValue = np.array(lowerValue)
-
-plt.rcParams.update({'font.size': 25})
-plt.xticks(np.arange(0, 30, step=7))
-plt.plot(T, (result[:,8]/(result[:,5] + result[:,8]))*100, T, meanValue*100)
-plt.fill_between(T, upperValue*100, lowerValue*100, color = 'k', alpha = 0.1)
-plt.errorbar([28],[48], yerr=[2], fmt='o',color='r', elinewidth=3, markersize=10, capsize=6, capthick=3, barsabove= False)
-plt.xlabel('TIME (days)')
-plt.ylabel('% Bone Tregs')
-plt.legend(['Fitted parameters', 'Mean value'])
-plt.show()
-'''
-
-'''
-# completing soboal analysis for each X1, X2, and X3
-print('\n\n====X1 Sobol output====\n\n')
-Si_X1 = sobol.analyze(problem, Y[:,0], print_to_console=True)
-print('\n\n====X2 Sobol output====\n\n')
-Si_X2 = sobol.analyze(problem, Y[:,1], print_to_console=True)
-print('\n\n====X3 Sobol output====\n\n')
-Si_X3 = sobol.analyze(problem, Y[:,2], print_to_console=True)
-'''
 
 
 Si = sobol.analyze(problem, Y[:,8], print_to_console=True)
 print(Si['S1'])
 print(Si['ST'])
-
-
 
 
 # set width of bar
@@ -347,19 +243,14 @@ r2 = [x + barWidth for x in r1]
 print(r2)
 
 
-plt.figure(figsize=(20.0, 15.0))
-plt.rcParams.update({'font.size': 25})
+#plt.figure(figsize=(20.0, 15.0))
+plt.rcParams.update({'font.size': 15})
 plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
 plt.yscale('log')
-#time = np.arange(0.0, k, 1)
-#print(time)
-#time = ['b-','b+','γ','FB1', 'AB12', 'AB23', 'δTR12', 'δTR23']
 matplotlib.pyplot.bar(r1, Si['S1'], width=0.25, bottom=None, align='center', data=None)
 matplotlib.pyplot.bar(r2, Si['ST'], width=0.25, bottom=None, align='center', data=None)
 plt.ylabel('Global sensitivity of bone Tregs')
-#plt.ylim([0.00000000000000000000001,1])
-plt.xticks([r + barWidth/2 for r in range(8)], ['b-','b+','γ','FB1', 'AB12', 'AB23', 'δTR12', 'δTR23'])
+plt.xticks([r + barWidth/2 for r in range(8)], ['b-','b+','γ','FB1', 'AB12', 'AB23', 'δT12', 'δT23'])
 plt.ylim([0.0001,1])
-plt.savefig("6.png", dpi = 300, bbox_inches='tight')
-
+#plt.savefig("images/IECR/" + "11.png", dpi = 300, bbox_inches='tight')
 plt.show()

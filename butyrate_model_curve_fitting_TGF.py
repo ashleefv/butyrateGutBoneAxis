@@ -10,7 +10,11 @@ import random, pickle
 import pandas as pd
 from scipy.optimize import fsolve, least_squares
 from scipy.optimize import curve_fit
-import cv2
+
+#result111 = np.array(pickle.load(open('result1.p', 'rb')))
+#result222 = np.array(pickle.load(open('result2.p', 'rb')))
+#T1 = np.array(pickle.load(open('time.p', 'rb')))
+
 
 # butyrate dose in the intestine
 bI1 = 0.18  # with antibiotic -0.11, -0.093, -0.13
@@ -50,8 +54,8 @@ but_half = 166.3  # butyrate half life day-1
 # rhoT = 20.6
 # rhoTV = 0.49888397
 # rhoTk = 0.2539052
-rhoTV = 0.51664553
-rhoTk = 0.33229081
+#rhoTV = 0.51664553
+#rhoTk = 0.33229081
 # rhoT1 = 39.
 rhoW = 1.7
 
@@ -248,7 +252,7 @@ print('tss', tss)
 x_guess = 0
 x_fit = 0
 
-rhoTV = .75
+rhoTV = .5
 rhoTk = 0.33
 rms = 1
 rms1 = 1
@@ -346,7 +350,7 @@ while (break_check_counter != break_check_counter1):
         # c_sol1.append(C_sol)
         c_sol1[0] = C_sol[:, 9]
         x = (x0, x1, x2, x3, x4, x5, x6, x7, x8, C_data1[0])  # initial value
-        C_sol = np.array(odeint(myode, x, t, args=(-0.13, 0)))
+        C_sol = np.array(odeint(myode, x, t, args=(-0.11, 0)))
         # c_sol1.append(C_sol)
         c_sol1[1] = C_sol[:, 9]
 
@@ -513,33 +517,41 @@ while (break_check_counter != break_check_counter1):
             return y
 
         x = (x0,x1,x2,x3,x4,x5,x6,x7,x8,C_data[0])     #initial value
-        C_sol = odeint(myode, x, t,args=(-0.13,0))
+        C_sol = odeint(myode, x, t,args=(-0.11,0))
         #print('thissssss', C_sol)
         return C_sol[:,9]
 
 
 
     # tfit = np.linspace(1, 50)
-    fit1 = fitfunc1(tspan, k_fit[0], k_fit[1])
-    fit2 = fitfunc2(tspan, k_fit[0], k_fit[1])
+    tspan1 = np.arange(0.0, 80.736, 0.001)
+    fit1 = fitfunc1(tspan1, k_fit[0], k_fit[1])
+    fit2 = fitfunc2(tspan1, k_fit[0], k_fit[1])
 
 
-    plt.rcParams.update({'font.size': 25})
+    plt.rcParams.update({'font.size': 25,'legend.fontsize': 20})
+    #plt.rcParams.update({'font.size': 25})
     # plt.xticks(np.arange(0, 30, step=7))
     #plt.yticks(np.arange(0, 8, step=1))
     plt.plot(tspan[0:2], C_data[0:2], 'ro', label='Data', markersize=12)
     plt.plot(tspan[0:2], C_data1[0:2], 'ro', markersize=12)
     plt.plot(tspan[2], C_data[2], 'ro', fillstyle = 'none', label='S.S.', markersize=12)
     plt.plot(tspan[2], C_data1[2], 'ro', fillstyle = 'none', markersize=12)
-    plt.plot(tspan, fit1, 'b-', label='Fit', linewidth=3)
-    plt.plot(tspan, fit2, 'b-', linewidth=3)
+
+
+
+    plt.plot(tspan1, fit1, 'b-', label='Fitted f(t)', linewidth=3)
+    plt.plot(tspan1, fit2, 'b-', linewidth=3)
+
+    #plt.plot(T1, result111[:, 9], color='orange', label='Fitted f(t)', linewidth=3)
+    #plt.plot(T1, result222[:, 9], color='orange', linewidth=3)
     #plt.legend(loc='upper left', framealpha=0.05)
     plt.legend(loc='upper left')
-    plt.xlabel('TIME (days)')
+    plt.xlabel('Time (days)')
     plt.ylabel('TGF-β fold change')
     plt.title('RMSE= %f' %rms)
     plt.ylim([0,7.3])
-    plt.savefig('images/combined/' + str(counter) + '.png', dpi=300, bbox_inches='tight')
+    #plt.savefig('images/smb/' + str(counter) + '.png', dpi=300, bbox_inches='tight')
     counter += 1
     # plt.hold(False)
     # plt.show()
@@ -567,7 +579,7 @@ plt.plot(T, result[:, 8], linewidth=3)
 # plt.plot(T, result[:,10], linewidth=3)
 # plt.legend(['Bone Treg'])
 plt.legend(['with butyrate'])
-plt.xlabel('TIME (days)')
+plt.xlabel('Time (days)')
 plt.ylabel('TGF-beta fold change')
 # plt.ylabel('Fraction of Naive Tregs in bone')
 # plt.plot(T, result[:,3])

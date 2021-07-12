@@ -21,37 +21,37 @@ for i in range(Nc):
         y = [0.0 for i in range(len(x))]
 
         # butyrate in intestine
-        y[0] = Fb - but_half * x[0] - Ab * x[0]
+        y[0] = FB1 - muB * x[0] - AB12 * x[0]
 
         # butyrate in blood
-        y[1] = Ab * x[0] - but_half * x[1] - Ab1 * x[1]
+        y[1] = AB12 * x[0] - muB * x[1] - AB23 * x[1]
 
         # butyrate in bone
-        y[2] = Ab1 * x[1] - but_half * x[2]
+        y[2] = AB23 * x[1] - muB * x[2]
 
         # naive T cells in intestine
-        y[3] = formationI - without_but1 * gamma * x[3] - Eta1 * x[3] - with_but1 * x[3] * x[0] + formationI1
+        y[3] = FN1_minus - b_minus * gamma * x[3] - muN * x[3] - b_plus * x[3] * x[0] + FN1_plus
 
         # naive T cells in Blood
-        y[4] = formationB - without_but1 * gamma * x[4] - Eta1 * x[4] - with_but1 * x[4] * x[1] + formationB1
+        y[4] = FN2_minus - b_minus * gamma * x[4] - muN * x[4] - b_plus * x[4] * x[1] + FN2_plus
 
         # naive T cells in Bone
-        y[5] = formationb - without_but1 * gamma * x[5] - Eta1 * x[5] - with_but1 * x[5] * x[2] + formationb1
+        y[5] = FN3_minus - b_minus * gamma * x[5] - muN * x[5] - b_plus * x[5] * x[2] + FN3_plus
 
         # regulatory T cells in intestine
-        y[6] = without_but1 * gamma * x[3] + with_but1 * x[3] * x[0] - Gamma2 * x[6] - Eta2 * x[6]
+        y[6] = b_minus * gamma * x[3] + b_plus * x[3] * x[0] - deltaT12 * x[6] - muT * x[6]
 
         # regulatory T cells in blood
-        y[7] = Gamma2 * x[6] - Eta2 * x[7] - Gamma3 * x[7] + without_but1 * gamma * x[4] + with_but1 * x[4] * x[1]
+        y[7] = deltaT12 * x[6] - muT * x[7] - deltaT23 * x[7] + b_minus * gamma * x[4] + b_plus * x[4] * x[1]
 
         # regulatory T cells in bone
-        y[8] = Gamma3 * x[7] - Eta3 * x[8] + with_but1 * x[5] * x[2] + without_but1 * gamma * x[5]
+        y[8] = deltaT23 * x[7] - muT * x[8] + b_plus * x[5] * x[2] + b_minus * gamma * x[5]
 
         # TGF-beta production and decay
-        y[9] = q4 * x8 + rhoTV * (x[8] / x8 - 1) / (rhoTk - (x[8] / x8 - 1)) - Eta4 * x[9]
+        y[9] = muT_beta * (1 - x[9]) + VT_beta * (x[8] / x8 - 1) / (kT_beta - (x[8] / x8 - 1))
 
         # Wnt10b formation
-        y[10] = q4 * x8 + rhoW * (x[9] / x9 - 1) - Eta4 * x[10]
+        y[10] = muW * (1 - x[10]) + rhoW * (x[9] / x9 - 1)
 
 
         # S Osteocytes
@@ -154,33 +154,20 @@ if Nc==12:
 T1 = np.arange(0.0, Nc*cyclelength, 0.001)
 
 plt.rcParams.update({'font.size': 25})
-plt.plot(T1, result_f[:,15], linewidth=3)
-plt.xlabel('TIME (days)')
-plt.ylabel('Relative bone volume (%)')
-plt.show()
 
-plt.plot(T1, result_f[:,11], linewidth=3)
-plt.xlabel('TIME (days)')
-plt.ylabel('Osteocyte cells')
-plt.show()
-
-plt.plot(T1, result_f[:,12], linewidth=3)
-plt.xlabel('TIME (days)')
-plt.ylabel('Pre-osteoblast cells')
-plt.show()
-
-plt.plot(T1, result_f[:,13], linewidth=3)
-plt.xlabel('TIME (days)')
-plt.ylabel('Osteoblast cells')
-plt.show()
-
-plt.plot(T1, result_f[:,14], linewidth=3)
-plt.xlabel('TIME (days)')
-plt.ylabel('Osteoclast cells')
+plt.plot(T1, (result_f[:,8]/(result_f[:,5] + result_f[:,8]))*100, linewidth=3)
+plt.xlabel('Time (days)')
+plt.ylabel('Bone Tregs (%)')
 plt.show()
 
 plt.plot(T1, result_f[:,10], linewidth=3)
 plt.xlabel('TIME (days)')
 plt.ylabel('Wnt10b fold change')
 plt.show()
+
+plt.plot(T1, result_f[:,15], linewidth=3)
+plt.xlabel('Time (days)')
+plt.ylabel('Relative bone volume (%)')
+plt.show()
+
 

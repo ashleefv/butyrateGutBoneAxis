@@ -30,29 +30,28 @@ x71 = blood_fraction1/(1-blood_fraction1)
 
 
 # constant parameters
-without_but1 = 0.1718       # without butyrate naive T cell differentiation
-Eta1 = 0.02                 # Half-life of naive T cells
-Eta2 = 0.064                # Half-life of T lymphocytes
-Eta3 = 0.064                # Half-life of T lymphocytes
-q4 = 2.762                  # TGF-beta production by Tregs in the target organ
-Eta4 = 2.0                  # Half-life of TGF-beta
-but_half = 166.3            # butyrate half life day-1
+b_minus = 0.1718       # without butyrate naive T cell differentiation
+muN = 0.02                 # Half-life of naive T cells
+muT = 0.064                # Half-life of T lymphocytes
+muT_beta = 2.0                  # Half-life of TGF-beta
+muW = 2.0                  # Half-life of Wnt10b
+muB = 166.3            # butyrate half life day-1
 
 
 # estimated parameters from both positive and negative butyrate dose
-rhoTV = 2.659825171419453           # rate constant for TGF-beta production from Tregs
-rhoTk = 0.36332299958391195         # rate constant for TGF-beta production from Tregs
+VT_beta = 2.912805677408164           # rate constant for TGF-beta production from Tregs
+kT_beta = 0.37781498291954285         # rate constant for TGF-beta production from Tregs
 
-rhoW = 1.7                          # rate constant for Wnt10b production induced by TGF-beta
+rhoW = 1.72                          # rate constant for Wnt10b production induced by TGF-beta
 
 
 # evaluating migration rate, activity and intestine percentage of Tregs
 # x = intestine content, y = migration rate, z = activity
 def f(variable):
     x, y, z = variable
-    first = without_but1*z - y*x - Eta2*x
-    second = y * x - Eta2 * x7 - y * x7  + without_but1*z
-    third = y * x7 - Eta3 * x8 + without_but1*z
+    first = b_minus*z - y*x - muT*x
+    second = y * x - muT * x7 - y * x7  + b_minus*z
+    third = y * x7 - muT * x8 + b_minus*z
     return (first, second, third)
 
 solution =  fsolve(f, (0.1, 0.1, 0.1))
@@ -62,9 +61,9 @@ print(solution)
 # evaluating constant formation and absorption rate for distribution of butyrate
 def f(variable):
     fb , mb, m1b = variable
-    first = fb - but_half * bI - mb * bI
-    second = mb * bI - but_half * bB - m1b * bB
-    third = m1b * bB - but_half * bb
+    first = fb - muB * bI - mb * bI
+    second = mb * bI - muB * bB - m1b * bB
+    third = m1b * bB - muB * bb
     return (first, second, third)
 
 solution1 =  fsolve(f, (0.1,0.1,0.1))
@@ -74,8 +73,8 @@ print(solution1)
 # evaluating rate constant parameter for butyrate
 def f(variable):
     xnew, b = variable
-    first = without_but1*solution[2] - xnew*solution[1] - Eta2*xnew + b*bI
-    second = xnew*solution[1] - Eta2 * x71 - solution[1]*x71  + without_but1*solution[2] + b*bB
+    first = b_minus*solution[2] - xnew*solution[1] - muT*xnew + b*bI
+    second = xnew*solution[1] - muT * x71 - solution[1]*x71  + b_minus*solution[2] + b*bB
     return (first, second)
 
 solution2 =  fsolve(f, (0.1,0.1))
@@ -84,7 +83,7 @@ solution2 =  fsolve(f, (0.1,0.1))
 # Updating butyrate dose
 def f(variable):
     fb = variable
-    first = fb - but_half * bI1 -  solution1[1] * bI1
+    first = fb - muB * bI1 -  solution1[1] * bI1
     return (first)
 
 solution3 =  fsolve(f, (0.1))
@@ -92,12 +91,12 @@ solution3 =  fsolve(f, (0.1))
 
 # evaluated parameters
 gamma = solution[2]           # activity
-Gamma2 = solution[1]          # Migration of regulatory T cells from the intestine T to the blood
-Gamma3 = solution[1]          # Migration of regulatory T cells from the blood T to the bone
-Fb = solution3[0]             # constant formation rate of butyrate
-Ab = solution1[1]             # Absorption of butyrate in blood
-Ab1 = solution1[2]             # Absorption of butyrate in bone
-with_but1 = solution2[1]      # rate constant parameter for butyrate
+deltaT12 = solution[1]          # Migration of regulatory T cells from the intestine T to the blood
+deltaT23 = solution[1]          # Migration of regulatory T cells from the blood T to the bone
+FB1 = solution3[0]             # constant formation rate of butyrate
+AB12 = solution1[1]             # Absorption of butyrate in blood
+AB23 = solution1[2]             # Absorption of butyrate in bone
+b_plus = solution2[1]      # rate constant parameter for butyrate
 
 # Initial values
 x0 = 0                        # butyrate in the intestine
@@ -114,23 +113,23 @@ x10 = 1                       # Wnt10b in bone
 
 # formation of naive CD4+ T cell without and with butyrate
 # without butyrate
-formationI = without_but1*gamma*x3 + Eta1*x3
-formationB = without_but1*gamma*x4 + Eta1*x4
-formationb = without_but1*gamma*x5 + Eta1*x5
+FN1_minus = b_minus*gamma*x3 + muN*x3
+FN2_minus = b_minus*gamma*x4 + muN*x4
+FN3_minus = b_minus*gamma*x5 + muN*x5
 
 #with butyrate
-bB1 = (solution1[1] * bI1)/(but_half + solution1[2])
-bb1 = bB1*solution1[2]/but_half
+bB1 = (solution1[1] * bI1)/(muB + solution1[2])
+bb1 = bB1*solution1[2]/muB
 #print(bB1,bb1)
 
 if solution3[0] != 0:
-    formationI1 = with_but1*x3*bI1
-    formationB1 = with_but1*x4*bB1
-    formationb1 = with_but1*x5*bB1
+    FN1_plus = b_plus*x3*bI1
+    FN2_plus = b_plus*x4*bB1
+    FN3_plus = b_plus*x5*bB1
 else:
-    formationI1 = 0
-    formationB1 = 0
-    formationb1 = 0
+    FN1_plus = 0
+    FN2_plus = 0
+    FN3_plus = 0
 
 
 
