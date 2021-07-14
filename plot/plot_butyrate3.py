@@ -5,8 +5,8 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import random,pickle
 
-result1 = np.array(pickle.load(open('resultP.p', 'rb')))
-result2 = np.array(pickle.load(open('resultN.p', 'rb')))
+result1 = np.array(pickle.load(open('resultP.p', 'rb')))            # for input butyrate bI1 = 0.18
+result2 = np.array(pickle.load(open('resultN.p', 'rb')))            # for input butyrate bI1 = -0.11
 T = np.array(pickle.load(open('time1.p', 'rb')))
 
 plt.rcParams.update({'font.size': 25,'legend.fontsize': 20})
@@ -17,7 +17,7 @@ plt.legend(['0.18 \u03bcM','-0.11 \u03bcM'])
 plt.ylabel('TGF-β fold change')
 plt.xlabel('Time (days)')
 plt.ylim([0,3.5])
-plt.savefig("images/IECR/" + "14.png", dpi = 300, bbox_inches='tight')
+#plt.savefig("images/IECR/" + "14.png", dpi = 300, bbox_inches='tight')
 plt.show()
 
 plt.rcParams.update({'font.size': 25,'legend.fontsize': 20})
@@ -28,5 +28,5 @@ plt.legend(['0.18 \u03bcM','-0.11 \u03bcM'])
 plt.ylabel('Wnt10b fold change')
 plt.xlabel('Time (days)')
 plt.ylim([0,3.5])
-plt.savefig("images/IECR/" + "15.png", dpi = 300, bbox_inches='tight')
+#plt.savefig("images/IECR/" + "15.png", dpi = 300, bbox_inches='tight')
 plt.show()

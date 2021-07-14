@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 tspan = [1, 2, 3]
-C_data = [1.46, 21.50, 27.45]       # data without butyrate
+C_data = [1.46, 21.50, 27.45]      # data without butyrate
 #C_data = [1.46, 26.35, 46.40]      # data with butyrate
 
 # without butyrate = 0.1717933, with butyrate = 0.30026203, combined = 0.12846854

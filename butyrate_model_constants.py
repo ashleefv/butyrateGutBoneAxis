@@ -6,6 +6,10 @@ from scipy.optimize import fsolve, least_squares
 # butyrate dose in the intestine
 bI1 = 0.18      # with antibiotic -0.11
 
+# input parameters for bone metabolism
+Nc = 2                       # number of cycle (current code works for 1, 2, 6, and 12 cycle)
+cyclelength= 14              # length of each remodeling cycle
+case = 2                     # select case (for case 1 set bI1 = 0)
 
 # Data for parameter estimation
 # value of distribution
@@ -31,19 +35,18 @@ x71 = blood_fraction1/(1-blood_fraction1)
 
 # constant parameters
 b_minus = 0.1718       # without butyrate naive T cell differentiation
-muN = 0.02                 # Half-life of naive T cells
-muT = 0.064                # Half-life of T lymphocytes
-muT_beta = 2.0                  # Half-life of TGF-beta
-muW = 2.0                  # Half-life of Wnt10b
+muN = 0.02             # Half-life of naive T cells
+muT = 0.064            # Half-life of T lymphocytes
+muT_beta = 2.0         # Half-life of TGF-beta
+muW = 2.0              # Half-life of Wnt10b
 muB = 166.3            # butyrate half life day-1
 
 
 # estimated parameters from both positive and negative butyrate dose
-VT_beta = 2.912805677408164           # rate constant for TGF-beta production from Tregs
-kT_beta = 0.37781498291954285         # rate constant for TGF-beta production from Tregs
+VT_beta = 2.86         # rate constant for TGF-beta production from Tregs
+kT_beta = 0.373        # rate constant for TGF-beta production from Tregs
 
-rhoW = 1.72                          # rate constant for Wnt10b production induced by TGF-beta
-
+rhoW = 1.72            # rate constant for Wnt10b production induced by TGF-beta
 
 # evaluating migration rate, activity and intestine percentage of Tregs
 # x = intestine content, y = migration rate, z = activity
@@ -117,15 +120,14 @@ FN1_minus = b_minus*gamma*x3 + muN*x3
 FN2_minus = b_minus*gamma*x4 + muN*x4
 FN3_minus = b_minus*gamma*x5 + muN*x5
 
-#with butyrate
-bB1 = (solution1[1] * bI1)/(muB + solution1[2])
-bb1 = bB1*solution1[2]/muB
-#print(bB1,bb1)
+# check for influx of naive CD4+ T cells
+bB1 = (solution1[1] * bI1)/(muB + solution1[2])        # blood butyrate
+bb1 = bB1*solution1[2]/muB                             # bone butyrate
 
 if solution3[0] != 0:
     FN1_plus = b_plus*x3*bI1
     FN2_plus = b_plus*x4*bB1
-    FN3_plus = b_plus*x5*bB1
+    FN3_plus = b_plus*x5*bb1
 else:
     FN1_plus = 0
     FN2_plus = 0
@@ -134,24 +136,33 @@ else:
 
 
 # parameters for bone metabolism
+
+sc = cyclelength       # scaling factor to convert 100 days cycle
+
+# estimated parameters
+kop = 0.051
+kod = 0.196
+kodw = 1.045
+kca = 0.072
+kcd = 0.0034
+kzo = 0.00897
+kzc = 0.4084
+
+
+
+# initial value
 S0=180
 P0=0
 B0=0
 C0=0
 z0=100
 
-sc = 14  # scaling factor
-
+# default parameters
 kM=25
-Nc=2
-cyclelength=sc
-tlag=14*(sc/100)
 kg_1= 2.15e-1
 kg_2= 2.98e-2
 kg_3= 1.28e-3
 kg_4= 8.42
-
-
 Bone=1
 alpha_1=0.5
 alpha_2=0.1
@@ -179,12 +190,3 @@ epsilon=1
 beta_3=0.1
 rho=20
 
-kop = 0.051
-kod = 0.196
-kodw = 1.045
-kca = 0.072
-kcd = 0.0034
-kzo = 0.00897
-kzc = 0.4084
-
-case = 2          # select case

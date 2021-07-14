@@ -51,7 +51,7 @@ for i in range(Nc):
         y[9] = muT_beta * (1 - x[9]) + VT_beta * (x[8] / x8 - 1) / (kT_beta - (x[8] / x8 - 1))
 
         # Wnt10b formation
-        y[10] = muW * (1 - x[10]) + rhoW * (x[9] / x9 - 1)
+        y[10] = muW * (1 - x[10]) + rhoW * (x[9] - 1)
 
 
         # S Osteocytes
@@ -132,7 +132,6 @@ for i in range(Nc):
 
 
 
-
 # 1 cycle
 if Nc==1:
     result_f = result
@@ -153,6 +152,7 @@ if Nc==12:
 #pickle.dump(result_f, open('case1.p', 'wb'))
 T1 = np.arange(0.0, Nc*cyclelength, 0.001)
 
+# plot
 plt.rcParams.update({'font.size': 25})
 
 plt.plot(T1, (result_f[:,8]/(result_f[:,5] + result_f[:,8]))*100, linewidth=3)
