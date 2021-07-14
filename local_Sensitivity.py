@@ -9,121 +9,112 @@ import random,pickle
 import numpy as np
 
 
-k = 8           # total number of parameters
 
-A = [1.0 for i in range(k)]
+# Input values
+# butyrate dose in the intestine
+bI1 = 0.18
 
-for j in range(k):
-    A[j] = 1
+# Data for parameter estimation
+# value of distribution
+blood_fraction = 0.13       # fraction regulatory T cell in blood
+bone_fraction = 0.42        # fraction regulatory T cell in bone
 
-    # Input values
-    # butyrate dose in the intestine
-    bI1 = 0.18
+# after butyrate
+blood_fraction1 = 0.16      # fraction regulatory T cell in blood after butyrate
 
-    # Data for parameter estimation
-    # value of distribution
-    blood_fraction = 0.13       # fraction regulatory T cell in blood
-    bone_fraction = 0.42        # fraction regulatory T cell in bone
+# Delta butyrate for parameter estimation (rate constant parameter for with_butyrate)
+bI = 0.18
+bB = 0.29
+bb = 0.29
 
-    # after butyrate
-    blood_fraction1 = 0.16      # fraction regulatory T cell in blood after butyrate
+# evaluating amount from percentage
+# assume constant amount of CD4+ T cell in intestine, blood and bone = 1
+x7 = blood_fraction/(1-blood_fraction)        # regulatory T cell in the Blood
+x8 = bone_fraction/(1-bone_fraction)          # regulatory T cell in the Bone
 
-    # Delta butyrate for parameter estimation (rate constant parameter for with_butyrate)
-    bI = 0.18
-    bB = 0.29
-    bb = 0.29
+x71 = blood_fraction1/(1-blood_fraction1)
 
-    # evaluating amount from percentage
-    # assume constant amount of CD4+ T cell in intestine, blood and bone = 1
-    x7 = blood_fraction/(1-blood_fraction)        # regulatory T cell in the Blood
-    x8 = bone_fraction/(1-bone_fraction)          # regulatory T cell in the Bone
+# constant parameters
+b_minus = 0.1718       # without butyrate naive T cell differentiation
+muN = 0.02             # Half-life of naive T cells
+muT = 0.064            # Half-life of T lymphocytes
+muB = 166.3            # butyrate half life day-1
 
-    x71 = blood_fraction1/(1-blood_fraction1)
+# evaluating migration rate, activity and intestine percentage of Tregs
+# x = intestine content, y = migration rate, z = activity
+def f(variable):
+    x, y, z = variable
+    first = b_minus*z - y*x - muT*x
+    second = y * x - muT * x7 - y * x7  + b_minus*z
+    third = y * x7 - muT * x8 + b_minus*z
+    return (first, second, third)
 
-    # constant parameters
-    b_minus = 0.1718*A[0]       # without butyrate naive T cell differentiation
-    muN = 0.02                 # Half-life of naive T cells
-    muT = 0.064                # Half-life of T lymphocytes
-    muB = 166.3            # butyrate half life day-1
+solution =  fsolve(f, (0.1, 0.1, 0.1))
 
-    # evaluating migration rate, activity and intestine percentage of Tregs
-    # x = intestine content, y = migration rate, z = activity
-    def f(variable):
-        x, y, z = variable
-        first = b_minus*z - y*x - muT*x
-        second = y * x - muT * x7 - y * x7  + b_minus*z
-        third = y * x7 - muT * x8 + b_minus*z
-        return (first, second, third)
+# evaluating constant formation and absorption rate for distribution of butyrate
+def f(variable):
+    fb , mb, m1b = variable
+    first = fb - muB * bI - mb * bI
+    second = mb * bI - muB * bB - m1b * bB
+    third = m1b * bB - muB * bb
+    return (first, second, third)
 
-    solution =  fsolve(f, (0.1, 0.1, 0.1))
-    #solution = least_squares(f, (0.1, 0.1, 0.1), bounds = ((0, 0, 0), (1, 1, 1)))
-    print(solution)
+solution1 =  fsolve(f, (0.1,0.1,0.1))
 
-    # evaluating constant formation and absorption rate for distribution of butyrate
-    def f(variable):
-        fb , mb, m1b = variable
-        first = fb - muB * bI - mb * bI
-        second = mb * bI - muB * bB - m1b * bB
-        third = m1b * bB - muB * bb
-        return (first, second, third)
+# evaluating rate constant parameter for butyrate
+def f(variable):
+    xnew, b = variable
+    first = b_minus*solution[2] - xnew*solution[1] - muT*xnew + b*bI
+    second = xnew*solution[1] - muT * x71 - solution[1]*x71  + b_minus*solution[2] + b*bB
+    return (first, second)
 
-    solution1 =  fsolve(f, (0.1,0.1,0.1))
-    print(solution1)
+solution2 =  fsolve(f, (0.1,0.1))
 
-    # evaluating rate constant parameter for butyrate
-    def f(variable):
-        xnew, b = variable
-        first = b_minus*solution[2] - xnew*solution[1] - muT*xnew + b*bI
-        second = xnew*solution[1] - muT * x71 - solution[1]*x71  + b_minus*solution[2] + b*bB
-        return (first, second)
+# Updating butyrate dose
+def f(variable):
+    fb = variable
+    first = fb - muB * bI1 -  solution1[1] * bI1
+    return (first)
 
-    solution2 =  fsolve(f, (0.1,0.1))
+solution3 =  fsolve(f, (0.1))
 
-    # Updating butyrate dose
-    def f(variable):
-        fb = variable
-        first = fb - muB * bI1 -  solution1[1] * bI1
-        return (first)
+# evaluated parameters
+gamma = solution[2]          # activity
+deltaT12 = solution[1]       # Migration of regulatory T cells from the intestine T to the blood
+deltaT23 = solution[1]       # Migration of regulatory T cells from the blood T to the bone
+FB1 = solution3[0]           # constant formation rate of butyrate
+AB12 = solution1[1]          # Absorption of butyrate in blood
+AB23 = solution1[2]          # Absorption of butyrate in bone
+b_plus = solution2[1]        # rate constant parameter for butyrate
 
-    solution3 =  fsolve(f, (0.1))
+# Initial values
+x0 = 0                        # butyrate in the intestine
+x1 = 0                        # butyrate in the blood
+x2 = 0                        # butyrate in the bone
+x3 = 1                        # naive CD4+ T cell in the intestine
+x4 = 1                        # naive CD4+ T cell in the Blood
+x5 = 1                        # naive CD4+ T cell in the Bone
+x6 = solution[0]*x3           # regulatory T cell in the intestine
+x7 = x7*x4                    # regulatory T cell in the Blood
+x8 = x8*x5                    # regulatory T cell in the Bone
 
-    # evaluated parameters
-    gamma = solution[2]*A[2]           # activity
-    deltaT12 = solution[1]*A[6]       # Migration of regulatory T cells from the intestine T to the blood
-    deltaT23 = solution[1]*A[7]           # Migration of regulatory T cells from the blood T to the bone
-    FB1 = solution3[0]*A[3]              # constant formation rate of butyrate
-    AB12 = solution1[1]*A[4]              # Absorption of butyrate in blood
-    AB23 = solution1[2]*A[5]              # Absorption of butyrate in bone
-    b_plus = solution2[1]*A[1]      # rate constant parameter for butyrate
+# formation of naive CD4+ T cell without and with butyrate
+# without butyrate
+FN1_minus = b_minus*gamma*x3 + muN*x3
+FN2_minus = b_minus*gamma*x4 + muN*x4
+FN3_minus = b_minus*gamma*x5 + muN*x5
 
-    # Initial values
-    x0 = 0                        # butyrate in the intestine
-    x1 = 0                        # butyrate in the blood
-    x2 = 0                        # butyrate in the bone
-    x3 = 1                        # naive CD4+ T cell in the intestine
-    x4 = 1                        # naive CD4+ T cell in the Blood
-    x5 = 1                        # naive CD4+ T cell in the Bone
-    x6 = solution[0]*x3              # regulatory T cell in the intestine
-    x7 = x7*x4                       # regulatory T cell in the Blood
-    x8 = x8*x5                       # regulatory T cell in the Bone
+# check for influx of naive CD4+ T cells
+bB1 = (AB12 * bI1)/(muB + AB23)
 
-    # formation of naive CD4+ T cell without and with butyrate
-    # without butyrate
-    FN1_minus = b_minus*gamma*x3 + muN*x3
-    FN2_minus = b_minus*gamma*x4 + muN*x4
-    FN3_minus = b_minus*gamma*x5 + muN*x5
-
-    # check for influx of naive CD4+ T cells
-    bB1 = (AB12 * bI1)/(muB + AB23)
-
-    if solution3[0] != 0:
-        FN1_plus = b_plus*x3*bI1
-        FN2_plus = b_plus*x4*bB1
-        FN3_plus = b_plus*x5*bB1
-    else:
-        FN1_plus = 0
-        FN2_plus = 0
-        FN3_plus = 0
+if solution3[0] != 0:
+    FN1_plus = b_plus*x3*bI1
+    FN2_plus = b_plus*x4*bB1
+    FN3_plus = b_plus*x5*bB1
+else:
+    FN1_plus = 0
+    FN2_plus = 0
+    FN3_plus = 0
 
 
 def diff(x,T):
@@ -165,14 +156,19 @@ N = 28        # Total number of days
 x = (x0,x1,x2,x3,x4,x5,x6,x7,x8)
 
 T = np.arange(0.0, N, 0.001)
-result1 = np.array(odeint(diff, x, T))
+resulth = np.array(odeint(diff, x, T))
+
+con = resulth[-1,8]/(resulth[-1,5] + resulth[-1,8])         # homeostasis value of bone Tregs
 
 
+# local sensitivity analysis
+
+k = 8           # total number of parameters
 store = []
 
 for j in range(k):
     A = [1.0 for i in range(k)]
-    A[j] = 0.9
+    A[j] = 1.1
 
     # Input values
 
@@ -329,19 +325,14 @@ for j in range(k):
 
     T = np.arange(0.0, N, 0.001)
     result = np.array(odeint(diff, x, T))
-    xx = int((28-0.001)/0.001)
-    store.append(result[xx,8]/(result[xx,5] + result[xx,8]))
+    store.append(result[-1,8]/(result[-1,5] + result[-1,8]))
 
-
-resultb = result1
-xx1 = int((28-0.001)/0.001)
-con = resultb[xx1,8]/(resultb[xx1,5] + resultb[xx1,8])
-
-# for 10% decrease
-multiplier = -0.1
 
 # for 10% increase
-#multiplier = 0.1           # turn of log scale (line 353) and ylim (line 358) as the responses are opposite
+multiplier = 0.1
+
+# for 10% decrease
+#multiplier = -0.1
 
 sensitivity =  np.subtract(store,con)/(con*multiplier)
 
