@@ -10,6 +10,8 @@ import pickle
 from butyrate_model_constants import *
 
 
+result = []
+output = []
 for i in range(Nc):
 
     def diff(x,T):
