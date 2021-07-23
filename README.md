@@ -17,7 +17,7 @@ Corresponding author: A. N. Ford Versypt, ashleefv@buffalo.edu
 ### Scripts
 
 * butyrate_model.py
-This file contains the function for obtaining the concentration profile of butyrate, percentage change in regulatory T cells, fold change of TGF-β and Wnt10b, and dynamics of bone cells and bone volume. Figures 3, 4, 5, 6, 11, and 12 are generated using this file. 
+This file contains the function for obtaining the concentration profile of butyrate, percentage change in regulatory T cells, fold change of TGF-β and Wnt-10b, and dynamics of bone cells and bone volume. Figures 3, 4, 5, 6, 11, and 12 are generated using this file. 
 
 * butyrate_model_constants.py
 This file contains input values and model parameters for butyrate_model.py file. The input value for change in intestine butyrate concentration can be varied from up to 0.2 μM.
@@ -27,6 +27,12 @@ This file contains the function for curve fitting with in vitro experimental res
 
 * butyrate_model_curve_fitting_TGF.py
 This file contains the function for simultaneous iterative curve fitting to estimate the dynamics of TGF-β for both positive and negative change of intestine butyrate concentration. Figure 10 is generated using this file.
+
+* butyrate_optimizing_Wnt.py
+This file contains the function for estimating the parameter ρ<sub>w </sub> for Wnt-10b.
+  
+* butyrate_optimizing_Wnt_constants.py
+This file contain corresponding fixed parameters for butyrate_optimizing_Wnt.py.
 
 * local_Sensitivity.py
 This file contains the function for local sensitivity analysis. Figure 7 is generated using this file.
