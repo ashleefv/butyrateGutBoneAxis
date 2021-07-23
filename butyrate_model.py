@@ -154,7 +154,9 @@ T1 = np.arange(0.0, Nc*cyclelength, 0.001)
 
 # plot
 plt.rcParams.update({'font.size': 25})
-
+print(result_f[-1,9])
+print(result_f[-1,10])
+print(result_f[-1,15])
 plt.plot(T1, (result_f[:,8]/(result_f[:,5] + result_f[:,8]))*100, linewidth=3)
 plt.xlabel('Time (days)')
 plt.ylabel('Bone Tregs (%)')

@@ -56,7 +56,7 @@ result = np.array(odeint(diff, x, T))
 
 # plot
 plt.rcParams.update({'font.size': 25})
-
+print(result[:,3])
 plt.plot(T, (result[:,8]/(result[:,5] + result[:,8]))*100, linewidth=3)
 plt.xlabel('Time (days)')
 plt.ylabel('Bone Tregs (%)')

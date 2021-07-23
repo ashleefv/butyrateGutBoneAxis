@@ -242,8 +242,8 @@ while (break_check_counter != break_check_counter1):
     c_sol1 = np.zeros((2, 3))
 
     tspan = np.array([0, int(28), int(tss * 0.001)])
-    C_data = [1, 3.4, x_guess]
-    C_data1 = [1, 0.9, x_guess1]
+    C_data = [1, 3.75, x_guess]
+    C_data1 = [1, 0.44, x_guess1]
 
     y_data[0] = np.array(C_data)
     y_data[1] = np.array(C_data1)
@@ -318,7 +318,8 @@ while (break_check_counter != break_check_counter1):
         C_sol = np.array(odeint(myode1, x, t, args=(0.18, k1, k2)))
         c_sol1[0] = C_sol[:, 9]
         x = (x0, x1, x2, x3, x4, x5, x6, x7, x8, C_data1[0])  # initial value
-        C_sol = np.array(odeint(myode1, x, t, args=(-0.11, k1, k2)))
+        t1 = np.array([0, int(28), int(tss * 0.001)])
+        C_sol = np.array(odeint(myode1, x, t1, args=(-0.11, k1, k2)))
         c_sol1[1] = C_sol[:, 9]
 
         return np.ravel(c_sol1)
@@ -369,13 +370,11 @@ while (break_check_counter != break_check_counter1):
     plt.xlabel('Time (days)')
     plt.ylabel('TGF-β fold change')
     plt.title('RMSE= %f' %rms)
-    plt.ylim([0,7.3])
-    #plt.savefig('images/smb/' + str(counter) + '.png', dpi=300, bbox_inches='tight')
+    plt.ylim([-0.5,7.3])
+    #plt.savefig('images/IECR/' + str(counter) + '.png', dpi=300, bbox_inches='tight')
     counter += 1
     plt.show(block=False)
     plt.pause(1)
     plt.close()
 
 print("parameters are: ", VT_beta, kT_beta)
-
-
