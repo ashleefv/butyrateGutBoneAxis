@@ -37,12 +37,6 @@ muW = 2.0              # Half-life of Wnt10b
 muB = 166.3            # butyrate half life day-1
 
 
-# estimated parameters from both positive and negative butyrate dose
-VT_beta = 2.86         # rate constant for TGF-beta production from Tregs
-kT_beta = 0.373        # rate constant for TGF-beta production from Tregs
-
-rhoW = 1.72            # rate constant for Wnt10b production induced by TGF-beta
-
 # evaluating migration rate, activity and intestine percentage of Tregs
 # x = intestine content, y = migration rate, z = activity
 def f(variable):

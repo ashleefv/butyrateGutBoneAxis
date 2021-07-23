@@ -318,8 +318,7 @@ while (break_check_counter != break_check_counter1):
         C_sol = np.array(odeint(myode1, x, t, args=(0.18, k1, k2)))
         c_sol1[0] = C_sol[:, 9]
         x = (x0, x1, x2, x3, x4, x5, x6, x7, x8, C_data1[0])  # initial value
-        t1 = np.array([0, int(28), int(tss * 0.001)])
-        C_sol = np.array(odeint(myode1, x, t1, args=(-0.11, k1, k2)))
+        C_sol = np.array(odeint(myode1, x, t, args=(-0.11, k1, k2)))
         c_sol1[1] = C_sol[:, 9]
 
         return np.ravel(c_sol1)

@@ -44,9 +44,9 @@ muB = 166.3            # butyrate half life day-1
 
 # estimated parameters from both positive and negative butyrate dose
 VT_beta = 6          # rate constant for TGF-beta production from Tregs
-kT_beta = 0.489        # rate constant for TGF-beta production from Tregs
+kT_beta = 0.489      # rate constant for TGF-beta production from Tregs
 
-rhoW = 1.64            # rate constant for Wnt10b production induced by TGF-beta
+rhoW = 1.64          # rate constant for Wnt10b production induced by TGF-beta
 
 # evaluating migration rate, activity and intestine percentage of Tregs
 # x = intestine content, y = migration rate, z = activity
