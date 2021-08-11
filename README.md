@@ -1,6 +1,8 @@
 # butyrateGutBoneAxis
 Three compartment pharmacokinetic model of butyrate in the gut-bone axis
 
+[![DOI](https://zenodo.org/badge/384794234.svg)](https://zenodo.org/badge/latestdoi/384794234)
+
 ## Overview 
 This mathematical model describes the effect of butyrate on regulatory T cells in the gut, blood, and bone compartments. This model also explores the direct and indirect immune-mediated impacts of butyrate on bone metabolism via TGF-β and Wnt10b signaling molecules.
 
