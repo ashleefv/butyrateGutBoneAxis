@@ -15,7 +15,7 @@ University at Buffalo, The State University of New York.
 Corresponding author: A. N. Ford Versypt, ashleefv@buffalo.edu
 
 ### Manuscript
-M. A. Islam, C. V. Cook, B. J. Smith, and A. N. Ford Versypt, Mathematical Modeling of the Gut-Bone Axis and Implications of Butyrate Treatment on Osteoimmunology, Industrial & Engineering Chemistry Research, 2021,60(49), 17814–17825. [!DOI: 10.1021/acs.iecr.1c02949.](https://pubs.acs.org/doi/abs/10.1021/acs.iecr.1c02949)
+M. A. Islam, C. V. Cook, B. J. Smith, and A. N. Ford Versypt, Mathematical Modeling of the Gut-Bone Axis and Implications of Butyrate Treatment on Osteoimmunology, Industrial & Engineering Chemistry Research, 2021,60(49), 17814–17825. [DOI: 10.1021/acs.iecr.1c02949.](https://pubs.acs.org/doi/abs/10.1021/acs.iecr.1c02949)
 
 ### Scripts
 
