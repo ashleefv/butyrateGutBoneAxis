@@ -14,7 +14,8 @@ University at Buffalo, The State University of New York.
 
 Corresponding author: A. N. Ford Versypt, ashleefv@buffalo.edu
 
-### Preprint
+### Manuscript
+M. A. Islam, C. V. Cook, B. J. Smith, and A. N. Ford Versypt, Mathematical Modeling of the Gut-Bone Axis and Implications of Butyrate Treatment on Osteoimmunology, Industrial & Engineering Chemistry Research, 2021,60(49), 17814–17825. [!DOI: 10.1021/acs.iecr.1c02949.](https://pubs.acs.org/doi/abs/10.1021/acs.iecr.1c02949)
 
 ### Scripts
 
@@ -47,3 +48,6 @@ This file contains the function for predicting change in bone regulatory T cells
 
 * prediction_Tregs_constants.py
 This file contains input value and model parameters for prediction_Tregs.py file.
+
+## Acknowledgements
+Research reported in this publication was supported by the National Institute of General Medical Sciences of the National Institutes of Health under award number R35GM133763. The content is solely the responsibility of the authors and does not necessarily represent the offcial views of the National Institutes of Health.
